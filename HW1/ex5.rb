@@ -33,3 +33,45 @@ class TestAttrAccWithHistory < Test::Unit::TestCase
 	end
 	
 end
+
+class Numeric
+
+	@currencies = {'dollar' => 1.0, 'yen' => 0.013, 'euro' => 1.292, 'rupee' => 0.019}
+
+	class << self
+		attr_reader :currencies
+	end
+	
+	def method_missing(method_id)
+		singular_currency = method_id.to_s.gsub( /s$/, '')
+		if Numeric.currencies.has_key?(singular_currency)
+			self * Numeric.currencies[singular_currency]
+		else
+			super
+		end
+	end
+	
+	def in(currency)
+		singular_currency = currency.to_s.gsub( /s$/, '')
+		if Numeric.currencies.has_key?(singular_currency)
+			self / Numeric.currencies[singular_currency]
+		else
+			raise WrongCurrency
+		end
+	end
+	
+end
+
+class NoSuchCurrencyError < StandardError ; end
+
+class TestAttrAccWithHistory < Test::Unit::TestCase
+
+	def test_dollars_in_euro
+		assert_equal(5.dollars/Numeric.currencies['euro'], 5.dollars.in(:euros))
+	end
+	
+	def test_euros_in_rupees
+		assert_equal(10.euros/Numeric.currencies['rupee'], 10.euros.in(:rupees))
+	end
+
+end
