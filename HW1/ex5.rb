@@ -75,3 +75,34 @@ class TestAttrAccWithHistory < Test::Unit::TestCase
 	end
 
 end
+
+class String
+	def palindrome?
+		normalized = self.downcase.gsub(/\W/, '')
+		normalized == normalized.reverse
+	end
+end
+
+module Enumerable
+	def palindrome?
+		array = self.to_a
+		array == array.reverse
+	end
+end
+
+class TestPalindrome < Test::Unit::TestCase
+
+	def test_is_palindrome
+		assert "A man, a plan, a canal -- Panama".palindrome?
+		assert "Madam, I'm Adam!".palindrome?
+	end
+	
+	def test_is_not_palindrome
+		assert !"Abracadabra".palindrome?
+	end
+	
+	def test_enumerable_is_palindrome
+		assert [1,2,3,2,1].palindrome?
+	end
+	
+end
